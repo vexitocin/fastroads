@@ -3527,16 +3527,16 @@
           (this.cycleLength = Bi[e]), super.set(e);
         }
       })();
-      const Zi = "Version 2.0.56";
+      const Zi = "Version 2.0.57";
       let Wi = localStorage.getItem("seen-version");
       const Fi = null !== Wi && Wi !== Zi,
         Hi = [
-          "2-3 Years Dagestan and forget",
+          "Version 2.0.57",
         ],
         Qi = {
-          targetDate: "Thursday",
+          targetDate: "20th May",
           changes: [
-            "More Vehicles and maps!",
+            "Various Bugfixes and Map Generation improvements",
           ],
         };
       window.localStorage.setItem("seen-version", Zi);
@@ -12571,7 +12571,7 @@
             cameras: xr,
           },
           Rover: {
-            enabled: !0,
+            enabled: !1,
             name: "Rover (Beta)",
             skins: [],
             bodyObj: i(14),
@@ -12618,7 +12618,6 @@
           Coach: vehicles.Bus,
           Lambo: vehicles.Lambo,
           Supercar: vehicles.Supercar,
-          Rover: vehicles.Rover,
           SuperBus: vehicles.SuperBus,
         },
         br = 1,
@@ -19512,11 +19511,11 @@
                   }),
                   Object(Ul.jsx)("div", {
                     id: "splash-header",
-                    children: "fast roads",
+                    children: "f a s t  r o a d s",
                   }),
                   Object(Ul.jsx)("div", {
                     id: "splash-subheader",
-                    children: "Version 2.0 - Refresh",
+                    children: "Version 2.0.57",
                   }),
                   t
                     ? Object(Ul.jsx)(_l, {
@@ -22448,7 +22447,7 @@
               Object(Ul.jsxs)("div", {
                 id: "game-error-message",
                 children: [
-                  "Apologies - please click below to continue with a different generation seed. Your distance progress will carry over.",
+                  "An Unknown Error has occured. Click Below to reload. - Your distance progress will carry over.",
                   Object(Ul.jsx)("br", {}),
                   Object(Ul.jsx)("br", {}),
                   "This error has been recorded for investigation.",
