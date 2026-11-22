@@ -44,6 +44,18 @@ This will install `pyinstaller` and `pywebview` (as this game is html based).
 When Discord is running, Rich Presence shows live speed, distance, and pause
 status. Discord Rich Presence is optional.
 
+Launch options (also accepted by the built executable):
+```powershell
+python .\run.py --no-rpc --windowed
+python .\run.py --rpc --fullscreen
+```
+RPC is enabled and fullscreen is the default. Use `--rpc` / `--no-rpc` and
+`--fullscreen` / `--windowed` to choose at launch. Startup and RPC diagnostics
+are printed to the console and written to `fastroads.log`; use `.\build.ps1 -Debug`
+to keep a console open in the packaged build. In the desktop game's Settings
+menu, you can also toggle Rich Presence and switch between fullscreen and
+windowed mode; those choices are saved for the next launch.
+
 ### Debug Version
 Run the same command but add this:
 ```powershell

@@ -20677,8 +20677,43 @@
             [c, p] = Object(s.useState)(w.value[x.DoubleTap]),
             [u, g] = Object(s.useState)(w.value[x.Units]),
             [A, m] = Object(s.useState)(w.value[x.AutoPause]),
-            [v, b] = Object(s.useState)(Bl.value);
+            [v, b] = Object(s.useState)(Bl.value),
+            [launcherSettingsReady, setLauncherSettingsReady] =
+              Object(s.useState)(!1),
+            [launcherRpcEnabled, setLauncherRpcEnabled] =
+              Object(s.useState)(!0),
+            [launcherFullscreen, setLauncherFullscreen] =
+              Object(s.useState)(!0);
           return (
+            Object(s.useEffect)(() => {
+              const loadLauncherSettings = () => {
+                const api = window.pywebview && window.pywebview.api;
+                api &&
+                  api.get_launcher_settings &&
+                  api
+                    .get_launcher_settings()
+                    .then((settings) => {
+                      setLauncherRpcEnabled(settings.rpc_enabled);
+                      setLauncherFullscreen(settings.fullscreen);
+                      setLauncherSettingsReady(!0);
+                    })
+                    .catch((error) =>
+                      console.error("Could not load launcher settings:", error)
+                    );
+              };
+              return (
+                loadLauncherSettings(),
+                window.addEventListener(
+                  "pywebviewready",
+                  loadLauncherSettings
+                ),
+                () =>
+                  window.removeEventListener(
+                    "pywebviewready",
+                    loadLauncherSettings
+                  )
+              );
+            }, []),
             Object(s.useEffect)(
               () => (
                 Bl.addListener(b),
@@ -20806,6 +20841,59 @@
                             selectedIndex: A,
                             onSelectIndex: (e) => w.set(x.AutoPause, e),
                           }),
+                          launcherSettingsReady &&
+                            Object(Ul.jsxs)(Ul.Fragment, {
+                              children: [
+                                Object(Ul.jsx)("div", {
+                                  className: "menu-panel-row menu-panel-title",
+                                  children: "discord rich presence",
+                                }),
+                                Object(Ul.jsx)(Vd, {
+                                  options: ["on", "off"],
+                                  selectedIndex: launcherRpcEnabled ? 0 : 1,
+                                  onSelectIndex: (e) => {
+                                    const enabled = 0 === e;
+                                    setLauncherRpcEnabled(enabled);
+                                    window.pywebview.api
+                                      .set_rpc_enabled(enabled)
+                                      .then((accepted) => {
+                                        accepted ||
+                                          setLauncherRpcEnabled(!enabled);
+                                      })
+                                      .catch((error) =>
+                                        console.error(
+                                          "Could not change Rich Presence:",
+                                          error
+                                        )
+                                      );
+                                  },
+                                }),
+                                Object(Ul.jsx)("div", {
+                                  className: "menu-panel-row menu-panel-title",
+                                  children: "window mode",
+                                }),
+                                Object(Ul.jsx)(Vd, {
+                                  options: ["fullscreen", "windowed"],
+                                  selectedIndex: launcherFullscreen ? 0 : 1,
+                                  onSelectIndex: (e) => {
+                                    const fullscreen = 0 === e;
+                                    setLauncherFullscreen(fullscreen);
+                                    window.pywebview.api
+                                      .set_fullscreen(fullscreen)
+                                      .then((accepted) => {
+                                        accepted ||
+                                          setLauncherFullscreen(!fullscreen);
+                                      })
+                                      .catch((error) =>
+                                        console.error(
+                                          "Could not change window mode:",
+                                          error
+                                        )
+                                      );
+                                  },
+                                }),
+                              ],
+                            }),
                           Object(Ul.jsx)("div", {
                             className: "menu-panel-row menu-panel-title",
                             children: "view distance",

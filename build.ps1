@@ -15,7 +15,7 @@ if ($Clean) {
 }
 
 Write-Host '[fastroadsinstall] Installing build + RPC dependencies...'
-python -m pip install pyinstaller pywebview pypresence pypresence-arRPC | Out-Null
+python -m pip install pyinstaller pywebview pypresence | Out-Null
 
 $iconFile = Join-Path $PSScriptRoot 'favicon_circle.ico'
 
@@ -88,6 +88,5 @@ Write-Host '[fastroadsinstall] Building executable...'
 
 Write-Host ''
 Write-Host '[fastroadsinstall] Build complete.'
-Write-Host '[fastroadsinstall] Supports Discord Rich Presence + arRPC.'
-Write-Host '[fastroadsinstall] Discord, Vesktop, ArmCord, etc should all work.'
+Write-Host '[fastroadsinstall] Supports Discord Rich Presence.'
 Write-Host '[fastroadsinstall] Output: dist\fastroads or dist\fastroads.exe'
