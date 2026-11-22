@@ -25,7 +25,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact: linux
+            extension: ""
+          - os: windows-latest
+            artifact: windows
+            extension: .exe
+          - os: macos-latest
+            artifact: macos
+            extension: ""
 
     steps:
       - name: Check out repository
@@ -58,4 +67,14 @@ jobs:
 
       - name: Build
         working-directory: recomp
-        run: go build .
+        run: go build -o fastroads-${{ matrix.artifact }}${{ matrix.extension }} .
+
+      - name: Upload runnable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: fastroads-${{ matrix.artifact }}
+          path: |
+            recomp/fastroads-${{ matrix.artifact }}${{ matrix.extension }}
+            recomp/README.md
+            static/media/
+          if-no-files-found: error
