@@ -1,0 +1,61 @@
+name: Build native Go game
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "recomp/**"
+      - "static/media/**"
+      - ".github/workflows/recomp.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "recomp/**"
+      - "static/media/**"
+      - ".github/workflows/recomp.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux graphics and audio libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            libasound2-dev \
+            libgl1-mesa-dev \
+            libx11-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxrandr-dev \
+            libxxf86vm-dev \
+            pkg-config
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: recomp/go.mod
+          cache-dependency-path: recomp/go.sum
+
+      - name: Test
+        working-directory: recomp
+        run: go test ./...
+
+      - name: Build
+        working-directory: recomp
+        run: go build .
