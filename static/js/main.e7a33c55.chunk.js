@@ -12666,7 +12666,7 @@
             metrics: Object.assign({}, vehicles.Roadster.metrics, {
               accel: 28,
               topSpeed: 65,
-              aeroFactor: -1.8,
+              aeroFactor: -3.5,
             }),
           }),
         },
@@ -12767,7 +12767,6 @@
       var Tr = new (class extends l {})(),
         Pr = new l(null);
       const Gr = "initialise",
-        Br = "feedback",
         Er = "analytics_returningPlayer",
         Zr = "analytics_totalTime",
         Wr = "analytics_totalDist",
@@ -12827,7 +12826,6 @@
           if (window.localStorage.getItem("analytics-disabled"))
             return (
               console.log("Analytics: Disabled; will not connect"),
-              window.localStorage.removeItem("unsent-feedback"),
               void (this.socket = { emit: () => {} })
             );
           this.connected ||
@@ -12911,7 +12909,6 @@
               (e.playerProfile.noWriteAnalytics = !0),
             this.socket.emit(Gr, e),
             this.checkLocation((e) => this.sendUpdate("location", e)),
-            this.sendCachedFeedback(),
             (this.analyticsInitialised = !0));
         }
         loadPlayerProfile() {
@@ -12979,36 +12976,6 @@
             this.setStorage(Ur, this.playerProfile.revisitCount),
             this.setStorage(Vr, this.playerProfile.sessionCount),
             this.setStorage(Xr, this.playerProfile.stickySteerCount));
-        }
-        sendFeedback(e) {
-          if (this.connected) this.sendUpdate(Br, e);
-          else {
-            let t = [];
-            if (window.localStorage.getItem("unsent-feedback"))
-              try {
-                t = JSON.parse(window.localStorage.getItem("unsent-feedback"));
-              } catch (Tc) {
-                t = [];
-              }
-            (t.push(e),
-              window.localStorage.setItem(
-                "unsent-feedback",
-                JSON.stringify(t),
-              ));
-          }
-        }
-        sendCachedFeedback() {
-          let e = [];
-          if (window.localStorage.getItem("unsent-feedback"))
-            try {
-              e = JSON.parse(window.localStorage.getItem("unsent-feedback"));
-              for (let t of e) this.sendUpdate(Br, t);
-            } catch (Tc) {
-              console.error(
-                "Could not write unsent feedback from prior session",
-              );
-            }
-          window.localStorage.removeItem("unsent-feedback");
         }
         sendUpdate(e, t) {
           var i;
@@ -16173,8 +16140,28 @@
       })();
       var Oo = { mouseWidgetHeight: 24, mouseWidgetWidth: 640, useMouse: !0 },
         Lo = i.p + "static/media/achievement.3ef707de.wav";
-      const Ro = { edge: !1 },
-        To = { edge: "achievement-edge" };
+      const Ro = {
+          edge: !1,
+          speed100: !1,
+          speed300: !1,
+          speed1000: !1,
+          speed5000: !1,
+          distance1: !1,
+          distance10: !1,
+          distance100: !1,
+          flying: !1,
+        },
+        To = {
+          edge: "achievement-edge",
+          speed100: "achievement-speed100",
+          speed300: "achievement-speed300",
+          speed1000: "achievement-speed1000",
+          speed5000: "achievement-speed5000",
+          distance1: "achievement-distance1",
+          distance10: "achievement-distance10",
+          distance100: "achievement-distance100",
+          flying: "achievement-flying",
+        };
       var Po = new (class extends m {
         constructor(...e) {
           (super(...e),
@@ -16191,8 +16178,22 @@
           (e in this.value &&
             !this.value[e] &&
             1 == t &&
-            (this.sound.play(), window.localStorage.setItem(To[e], t)),
+            (this.sound && this.sound.play(),
+              window.localStorage.setItem(To[e], t)),
             super.set(e, t));
+        }
+        check(speed, distance, vehicle, altitude) {
+          const mph = Math.abs(speed) * 2.2369362920544,
+            unlock = (key, condition) =>
+              condition && !this.value[key] && this.set(key, !0);
+          (unlock("speed100", mph >= 100),
+            unlock("speed300", mph >= 300),
+            unlock("speed1000", mph >= 1e3),
+            unlock("speed5000", mph >= 5e3),
+            unlock("distance1", distance >= 1609.344),
+            unlock("distance10", distance >= 16093.44),
+            unlock("distance100", distance >= 160934.4),
+            unlock("flying", "FlyingCar" === vehicle && altitude > 10));
         }
         loadAchievements() {
           let e, t;
@@ -17645,7 +17646,8 @@
             this.uiTimer > 0.033 && ((this.uiTimer -= 0.033), this.updateUI()),
             (this.pdT = e),
             (Ke.vehicleIndexDidChange = !1),
-            this.updateVehicleNode());
+            this.updateVehicleNode(),
+            Po.check(Sr.speed, Sr.dist, jr.value.type, z.position.y));
           try {
             this.audio.update(e);
           } catch (Tc) {
@@ -19143,11 +19145,7 @@
                   this.loadInactivityTimer > 3)
                 ) {
                   if (
-                    (Jr.sendFeedback(
-                      "LOAD ERROR: Stuck at progress ",
-                      this.loadProgress,
-                    ),
-                    !kr.NewPlayer)
+                    !kr.NewPlayer
                   )
                     return (
                       this.onError(
@@ -19167,7 +19165,6 @@
               return (
                 console.error(Tc),
                 this.onError(Tc.stack.toString()),
-                Jr.sendFeedback("LOAD ERROR: " + Tc.stack.toString()),
                 void game.retire()
               );
             }
@@ -19351,9 +19348,6 @@
                   Ke.vehicleIndex - Ke.initIndex + dr.accumulatedProgress,
                 ),
                 this.onError(Tc.stack.toString()),
-                Jr.sendFeedback(
-                  "UPDATE ERROR IN " + Tc.cause + ": " + Tc.stack.toString(),
-                ),
                 void game.retire()
               );
             }
@@ -19516,17 +19510,6 @@
                   }),
                 ),
               }),
-              Object(Ul.jsxs)("div", {
-                id: "splash-feedback-prompt",
-                children: [
-                  "Please use the feedback form to let me know what you think, or ",
-                  Object(Ul.jsx)("a", {
-                    href: "https://discord.gg/s8XPAAj",
-                    children: "join the discord",
-                  }),
-                  " and tell me personally!",
-                ],
-              }),
               Object(Ul.jsx)("hr", {
                 style: { borderColor: "#fff", opacity: 0.1 },
               }),
@@ -19640,22 +19623,6 @@
                     href: "#about",
                     children: ["about", Object(Ul.jsx)("br", {}), "\u25be"],
                   }),
-                  Object(Ul.jsxs)("div", {
-                    id: "splash-footer",
-                    children: [
-                      Object(Ul.jsx)("div", {
-                        className: "splash-footer-link",
-                        children: Object(Ul.jsxs)("a", {
-                          className: "splash-link",
-                          href: "https://discord.gg/s8XPAAj",
-                          children: [
-                            "discord",
-                            Object(Ul.jsx)("span", { className: "outlink" }),
-                          ],
-                        }),
-                      }),
-                    ],
-                  }),
                 ],
               }),
               Object(Ul.jsxs)("div", {
@@ -19763,7 +19730,7 @@
                             "After 16 months of full-time development, the initial goals for this project have been fulfilled, and so I'm considering it to be complete. That said, there are many features which didn't make the priority list for version 1. If there is interest, I would love to continue developing these features into the future.",
                             Object(Ul.jsx)("br", {}),
                             Object(Ul.jsx)("br", {}),
-                            "I'm committed to keeping Slow Roads freely available and free from adverts. Let me know which of the features below you would like to see most!",
+                            "I'm committed to keeping Slow Roads freely available and free from adverts. Potential future features include:",
                             Object(Ul.jsx)("br", {}),
                             Object(Ul.jsx)("br", {}),
                             Object(Ul.jsx)("div", {
@@ -19792,14 +19759,6 @@
                                 Object(Ul.jsx)("br", {}),
                               ],
                             }),
-                            Object(Ul.jsx)("br", {}),
-                            "Join the ",
-                            Object(Ul.jsx)("a", {
-                              className: "about-link",
-                              href: "https://discord.gg/t2UWVKcy3z",
-                              children: "discord server",
-                            }),
-                            " to suggest new ideas!",
                           ],
                         }),
                       }),
@@ -20119,7 +20078,6 @@
         Dd = i.p + "static/media/s_moon.ef286549.svg",
         Md = i.p + "static/media/venus.7fd51f92.svg",
         Nd = i.p + "static/media/panorama.568dc952.svg",
-        jd = i.p + "static/media/feedback2.24052523.svg",
         Cd = i.p + "static/media/controls.0048d852.svg",
         zd = i.p + "static/media/controls_mouse_icon.0ab0135a.svg",
         kd = i.p + "static/media/favicon_circle_white.eb1953e3.svg",
@@ -20743,7 +20701,6 @@
             children: [
               Object(Ul.jsx)(sc, {}),
               Object(Ul.jsx)(Bd, {}),
-              Object(Ul.jsx)(tc, {}),
               Object(Ul.jsx)(ec, {}),
               Object(Ul.jsx)("div", { className: "menu-bar-vertical-divider" }),
               Object(Ul.jsx)(ac, { toggleSplash: e }),
@@ -21110,146 +21067,6 @@
                       }),
                     ],
                   }),
-              ],
-            })
-          );
-        },
-        tc = () => {
-          const [e, t] = Object(s.useState)(!1),
-            [i, a] = Object(s.useState)(""),
-            [n, h] = Object(s.useState)(!1),
-            [r, o] = Object(s.useState)(!1);
-          return (
-            Object(s.useEffect)(() => {
-              e || h(!1);
-            }, [h, e]),
-            Object(s.useEffect)(
-              () => () => {
-                (input.setMouseEnabled(!0), input.unlockKeys());
-              },
-              [],
-            ),
-            Object(s.useEffect)(() => {
-              (e && (o(!1), window.localStorage.setItem("feedback-seen", !0)),
-                (e && !n) || (input.setMouseEnabled(!0), input.unlockKeys()));
-            }, [e, n]),
-            Object(Ul.jsxs)(Ul.Fragment, {
-              children: [
-                r &&
-                  Object(Ul.jsx)("div", {
-                    className: "feedback-prompt",
-                    children: "Any thoughts so far?",
-                  }),
-                e &&
-                  Object(Ul.jsxs)("div", {
-                    className: "feedback-main",
-                    onMouseEnter: (e) => {
-                      t(!0);
-                    },
-                    onMouseLeave: (e) => {
-                      t(!1);
-                    },
-                    children: [
-                      Object(Ul.jsxs)("div", {
-                        className: "feedback-header",
-                        children: [
-                          Object(Ul.jsx)("div", {
-                            className: "feedback-title",
-                            children: "Feedback",
-                          }),
-                          Object(Ul.jsx)("div", {
-                            className: "feedback-close",
-                            onMouseDown: (e) => {
-                              (t(!1), e.preventDefault());
-                            },
-                            children: "close",
-                          }),
-                        ],
-                      }),
-                      Object(Ul.jsxs)("div", {
-                        className: "feedback-blurb",
-                        children: [
-                          "Please share any thoughts, complaints, or ideas for features below.",
-                          Object(Ul.jsx)("br", {}),
-                          "You can also join the ",
-                          Object(Ul.jsx)("a", {
-                            className: "feedback-link",
-                            href: "https://discord.gg/s8XPAAj",
-                            children: "discord",
-                          }),
-                          " to talk to me directly.",
-                        ],
-                      }),
-                      n
-                        ? Object(Ul.jsx)("div", {
-                            className: "feedback-input feedback-sent",
-                            children: "Thanks!",
-                          })
-                        : Object(Ul.jsxs)(Ul.Fragment, {
-                            children: [
-                              Object(Ul.jsx)("textarea", {
-                                className: "feedback-input",
-                                type: "text",
-                                maxLength: "500",
-                                placeholder: "Max 500 characters",
-                                value: i,
-                                onChange: (e) => a(e.target.value),
-                                onFocus: () => {
-                                  input.lockKeys();
-                                },
-                                onBlur: () => {
-                                  input.unlockKeys();
-                                },
-                              }),
-                              Object(Ul.jsx)("div", {
-                                className: "feedback-send",
-                                onMouseDown: (e) => {
-                                  (i.length &&
-                                    !n &&
-                                    (Jr.sendFeedback(i),
-                                    a(""),
-                                    h(!0),
-                                    window.localStorage.setItem(
-                                      "feedback-seen",
-                                      !0,
-                                    )),
-                                    e.preventDefault());
-                                },
-                                children: "Send",
-                              }),
-                            ],
-                          }),
-                    ],
-                  }),
-                Object(Ul.jsx)("div", {
-                  className: e
-                    ? "menu-item item-selected"
-                    : r
-                      ? "menu-item highlight"
-                      : "menu-item",
-                  style: {
-                    padding: "0px 12px",
-                    width: "auto",
-                    textAlign: "right",
-                    display: "flex",
-                  },
-                  onMouseEnter: (e) => {
-                    (t(!0), e.preventDefault());
-                  },
-                  onMouseLeave: (e) => {
-                    (t(!1), e.preventDefault());
-                  },
-                  children: Object(Ul.jsx)("img", {
-                    alt: "",
-                    style: {
-                      height: "50%",
-                      marginTop: "25px",
-                      marginRight: "4px",
-                      transform: "translateY(-50%)",
-                    },
-                    src: jd,
-                  }),
-                }),
               ],
             })
           );
@@ -21847,6 +21664,38 @@
         edge: {
           title: "the map no load no more",
           body: "what the fuck did you do bro",
+        },
+        speed100: {
+          title: "Road Rocket",
+          body: "Reach 100 mph.",
+        },
+        speed300: {
+          title: "Three Hundred Club",
+          body: "Reach 300 mph.",
+        },
+        speed1000: {
+          title: "Breakboosting",
+          body: "Reach 1,000 mph.",
+        },
+        speed5000: {
+          title: "Ludicrous Speed",
+          body: "Reach 5,000 mph.",
+        },
+        distance1: {
+          title: "First Mile",
+          body: "Drive a mile in one journey.",
+        },
+        distance10: {
+          title: "Long Haul",
+          body: "Drive 10 miles in one journey.",
+        },
+        distance100: {
+          title: "Endless Road",
+          body: "Drive 100 miles in one journey.",
+        },
+        flying: {
+          title: "Sky Pilot",
+          body: "Take the Flying Car above 10 meters.",
         },
       };
       var mc = () => {

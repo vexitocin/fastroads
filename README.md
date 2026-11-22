@@ -25,6 +25,8 @@
 Vehicle paint color can be changed in the in-game Settings menu, where quick
 color presets and a reset option are also available. The selected color is saved
 between sessions. In the Flying Car, hold **I** to climb and **K** to dive.
+New local achievements reward speed milestones, long journeys, and taking the
+Flying Car airborne.
 
 ### New Terrain Generation
 * **Wide:** Generates significantly wider roads for easier high-speed maneuvering.
