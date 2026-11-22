@@ -18,6 +18,8 @@ import urllib.parse
 from datetime import datetime
 from pathlib import Path
 
+from updater import auto_update_if_available
+
 try:
     import webview
 except ImportError:
@@ -413,6 +415,9 @@ def install_rpc_bridge(window):
 
 def main():
     args = parse_args()
+    if auto_update_if_available(sys.argv[1:], log):
+        log("[Update] Closing this version; the updated release will start next")
+        return
     if webview is None:
         raise SystemExit("pywebview missing: pip install pywebview")
     settings = load_launcher_settings()

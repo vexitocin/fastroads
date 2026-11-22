@@ -57,13 +57,26 @@ jobs:
         shell: pwsh
         run: |
           $artifactPath = "dist/fastroads-${{ matrix.config }}.zip"
-          # Logic to handle folder build vs single file build
-          if ("${{ matrix.config }}" -eq "onefile") {
-             # OneFile usually puts the .exe directly in dist/
-             Compress-Archive -Path dist/*.exe -DestinationPath $artifactPath
+          $releaseVersion = if ($env:GITHUB_REF_TYPE -eq "tag") {
+            $env:GITHUB_REF_NAME
           } else {
-             # Normal/Debug puts files in dist/fastroads/
-             Compress-Archive -Path dist/fastroads/* -DestinationPath $artifactPath
+            "v2.0.$env:GITHUB_RUN_NUMBER"
+          }
+          $metadata = @{
+            version = $releaseVersion
+            channel = "${{ matrix.config }}"
+          } | ConvertTo-Json -Compress
+
+          if ("${{ matrix.config }}" -eq "onefile") {
+            $packageRoot = "dist/fastroads-package"
+            New-Item -ItemType Directory -Force -Path $packageRoot | Out-Null
+            Copy-Item -Path dist/fastroads.exe -Destination $packageRoot
+            Set-Content -Path "$packageRoot/fastroads-update.json" -Value $metadata -Encoding utf8NoBOM
+            Compress-Archive -Path "$packageRoot/*" -DestinationPath $artifactPath
+            Remove-Item -Recurse -Force $packageRoot
+          } else {
+            Set-Content -Path dist/fastroads/fastroads-update.json -Value $metadata -Encoding utf8NoBOM
+            Compress-Archive -Path dist/fastroads/* -DestinationPath $artifactPath
           }
           echo "ZIP_PATH=$artifactPath" >> $env:GITHUB_ENV
 

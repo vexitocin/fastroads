@@ -20,6 +20,11 @@
 | **Lamborghini** | ~363 mph | Low | Uses the Roadster model; higher speed. |
 | **Supercar** | ~60,000 mph | Chaotic | just a bit fast lowk |
 | **Superbus** | ~30,000 mph | Heavy | Uses the Coach model; speed. |
+| **Flying Car** | ~145 mph | Floaty | Builds lift as it accelerates. |
+
+Vehicle paint color can be changed in the in-game Settings menu, where quick
+color presets and a reset option are also available. The selected color is saved
+between sessions. In the Flying Car, hold **I** to climb and **K** to dive.
 
 ### New Terrain Generation
 * **Wide:** Generates significantly wider roads for easier high-speed maneuvering.
@@ -55,6 +60,14 @@ are printed to the console and written to `fastroads.log`; use `.\build.ps1 -Deb
 to keep a console open in the packaged build. In the desktop game's Settings
 menu, you can also toggle Rich Presence and switch between fullscreen and
 windowed mode; those choices are saved for the next launch.
+
+Official GitHub Windows releases check for a newer stable release at startup.
+When one is available, Fastroads verifies and downloads the matching build,
+replaces its app files, and restarts automatically. This requires an internet
+connection and write access to the folder containing `fastroads.exe`; source
+Python runs and the web version do not self-update. Existing installs must first
+install a release that includes the updater; subsequent releases install
+automatically.
 
 ### Debug Version
 Run the same command but add this:
