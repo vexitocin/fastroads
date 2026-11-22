@@ -27,6 +27,7 @@ CHANNEL_ASSETS = {
 MAX_ARCHIVE_SIZE = 512 * 1024 * 1024
 MAX_EXTRACTED_SIZE = 1024 * 1024 * 1024
 MAX_ARCHIVE_FILES = 100_000
+HELPER_START_TIMEOUT = 30
 USER_AGENT = "Fastroads-Updater"
 
 
@@ -294,14 +295,31 @@ def _start_update_helper(
             )
 
         status_path = stage_root / "helper-started"
-        deadline = time.monotonic() + 5
+        deadline = time.monotonic() + HELPER_START_TIMEOUT
         while time.monotonic() < deadline:
             if status_path.is_file():
                 return True
             if process.poll() is not None:
                 break
             time.sleep(0.1)
-        log("[Update] Could not start the update helper; continuing with this version")
+        exit_code = process.poll()
+        if exit_code is None:
+            log(
+                f"[Update] Update helper did not signal startup within "
+                f"{HELPER_START_TIMEOUT} seconds; stopping it"
+            )
+        else:
+            log(
+                f"[Update] Update helper exited with status {exit_code} "
+                "before signaling startup"
+            )
+        try:
+            with update_log.open("r", encoding="utf-8", errors="replace") as output:
+                details = "".join(output.readlines()[-8:]).strip()
+            if details:
+                log(f"[Update] Helper output: {details}")
+        except OSError as error:
+            log(f"[Update] Could not read helper output: {error}")
         if process.poll() is None:
             process.terminate()
             try:
