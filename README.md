@@ -1,13 +1,10 @@
-# <p align="center">f a s t &nbsp; r o a d s &nbsp; (V2)</p>
+# <p align="center">f a s t &nbsp; r o a d s &nbsp;</p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/downloads/mcflurrymuncha/fastroads/total?style=for-the-badge&color=blue" alt="Downloads">
-  <img src="https://img.shields.io/github/v/release/mcflurrymuncha/fastroads?style=for-the-badge&color=pink" alt="Release">
-  <a href="https://mcflurrymuncha.github.io/fastroads/">
+  <img src="https://img.shields.io/github/downloads/vexitocin/fastroads/total?style=for-the-badge&color=blue" alt="Downloads">
+  <img src="https://img.shields.io/github/v/release/vexitocin/fastroads?style=for-the-badge&color=pink" alt="Release">
+  <a href="https://vexitocin.github.io/fastroads/">
     <img src="https://img.shields.io/badge/Play-Web%20Version-orange?style=for-the-badge" alt="Play Web Version">
-  </a>
-  <a href="https://mcflurrymuncha.itch.io/fastroads">
-    <img src="https://img.shields.io/badge/Itch.io-FA5C5C?style=for-the-badge&logo=itch.io&logoColor=white" alt="Itch.io">
   </a>
 </p>
 </p>
