@@ -356,7 +356,7 @@
         }
       })(v);
       const b = window.location.pathname.includes("dash");
-      var game = new (class {
+      var game = window.__fastroadsGame = new (class {
           constructor() {
             (this.appTime = 0),
               (this.listeners = []),
@@ -12656,7 +12656,7 @@
       const Cr = "analytics_returningPlayer",
         zr = { newUser: null == localStorage.getItem(Cr) };
       var kr = zr;
-      var Sr = new (class {
+      var Sr = window.__fastroadsTelemetry = new (class {
         constructor() {
           (this.speed = 0), (this.dist = 0);
         }

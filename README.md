@@ -41,6 +41,8 @@ Open PowerShell in the root directory and run:
 .\build.ps1
 ```
 This will install `pyinstaller` and `pywebview` (as this game is html based).
+When Discord is running, Rich Presence shows live speed, distance, and pause
+status. Discord Rich Presence is optional.
 
 ### Debug Version
 Run the same command but add this:
